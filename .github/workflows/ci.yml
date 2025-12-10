@@ -23,7 +23,7 @@ jobs:
 
       - name: Run tests
         run: |
-          python -m pytest
+          python -m pytest --cov=src --cov=tests --cov-report=term-missing
 
       - name: Build Docker image
         run: |

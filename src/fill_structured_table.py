@@ -8,8 +8,7 @@ from config import DATABASE_URL
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def _run_sql_file(conn, relative_path: str) -> None:
-    """Execute a SQL file relative to the project root."""
+def _run_sql_file(conn, relative_path: str):
     sql_path = BASE_DIR / relative_path
     conn.execute(text(sql_path.read_text(encoding="utf-8")))
 
@@ -30,5 +29,3 @@ def fill_structured_table():
             {"start_date": start_date, "end_date": end_date},
         )
         conn.commit()
-
-    print("Данные трансформированы и загружены в структурированную таблицу")
