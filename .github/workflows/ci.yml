@@ -25,6 +25,6 @@ jobs:
         run: |
           python -m pytest --cov=src --cov=tests --cov-report=term-missing
 
-      - name: Build Docker image
+      - name: Build Docker
         run: |
           docker build -t etl-lab .

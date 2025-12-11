@@ -30,3 +30,4 @@ def test_fill_structured_table(mock_engine):
     
     fill_structured_table()
     assert mock_conn.execute.called
+    assert mock_conn.execute.call_count == 4

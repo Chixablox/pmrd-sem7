@@ -5,7 +5,7 @@ from config import DATABASE_URL
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def _run_sql_file(conn, relative_path: str):
+def run_sql_file(conn, relative_path):
     sql_path = BASE_DIR / relative_path
     conn.execute(text(sql_path.read_text(encoding="utf-8")))
 
@@ -15,7 +15,7 @@ def load_data_to_db(df):
 
     with engine.connect() as conn:
         conn.execute(text("create schema if not exists s_psql_dds"))
-        _run_sql_file(conn, "sql/dds/table/t_sql_source_unstructured.sql")
+        run_sql_file(conn, "sql/dds/table/t_sql_source_unstructured.sql")
         conn.execute(text("truncate table s_psql_dds.t_sql_source_unstructured"))
         conn.commit()
 
