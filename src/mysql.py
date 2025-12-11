@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import argparse
 import pandas as pd
 from sqlalchemy import create_engine, text
 
@@ -58,3 +58,14 @@ def dm_to_mysql(start_date, end_date):
     with mysql_engine.begin() as conn:
         conn.execute(text("CALL fn_dm_data_stg_to_dm_load(:start, :end)"), 
                         {"start": start_date, "end": end_date})
+
+def main():
+    parser = argparse.ArgumentParser(description="ETL: DM to MySQL")
+    parser.add_argument("start_date", help="Start date YYYY-MM-DD")
+    parser.add_argument("end_date", help="End date YYYY-MM-DD")
+    args = parser.parse_args()
+    
+    dm_to_mysql(args.start_date, args.end_date)
+
+if __name__ == "__main__":
+    main()
