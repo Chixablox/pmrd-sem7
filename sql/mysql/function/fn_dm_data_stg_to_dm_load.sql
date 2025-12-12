@@ -1,8 +1,6 @@
 create procedure fn_dm_data_stg_to_dm_load(in start_date date, in end_date date)
 begin
-    delete from t_dm_task
-    where sale_date between start_date and end_date
-       or sale_date is null;
+    delete from t_dm_task;
 
     insert into t_dm_task (
         source_id, sale_date,
