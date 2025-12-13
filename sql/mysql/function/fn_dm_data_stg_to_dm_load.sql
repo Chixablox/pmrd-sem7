@@ -3,7 +3,7 @@ begin
     delete from t_dm_task;
 
     insert into t_dm_task (
-        source_id, sale_date,
+        sale_date,
         product_id, product_name,
         category_id, category_name,
         customer_email_id, customer_email,
@@ -12,7 +12,7 @@ begin
         quantity, price, discount_percent, rating
     )
     select
-        source_id, sale_date,
+        sale_date,
         product_id, product_name,
         category_id, category_name,
         customer_email_id, customer_email,

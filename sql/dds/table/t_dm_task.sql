@@ -1,6 +1,5 @@
 create table if not exists s_psql_dds.t_dm_task (
     id bigserial primary key,
-    source_id integer,
     sale_date date,
     product_id integer,
     product_name varchar(255),

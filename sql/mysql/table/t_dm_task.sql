@@ -1,6 +1,5 @@
 create table if not exists t_dm_task (
     id bigint auto_increment primary key,
-    source_id int,
     sale_date date,
     product_id int,
     product_name varchar(255),

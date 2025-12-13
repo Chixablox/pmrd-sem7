@@ -41,7 +41,7 @@ begin
 
 
     insert into s_psql_dds.t_dm_task (
-        source_id, sale_date,
+        sale_date,
         product_id, product_name,
         category_id, category_name,
         customer_email_id, customer_email,
@@ -50,7 +50,6 @@ begin
         quantity, price, discount_percent, rating
     )
     select
-        s.id as source_id,
         s.sale_date,
         p.id as product_id,
         s.product_name,
