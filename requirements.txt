@@ -1,5 +1,5 @@
 streamlit>=1.0
-ploty>=5.0.0
+plotly>=5.0.0
 factory-boy
 pandas
 sqlalchemy
