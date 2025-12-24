@@ -21,7 +21,6 @@ def dm_to_mysql(start_date, end_date):
         """
         select
             id,
-            source_id,
             sale_date,
             product_id,
             product_name,

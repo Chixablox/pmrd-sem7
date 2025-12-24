@@ -1,9 +1,10 @@
-factory-boy==3.3.0
-pandas==2.1.4
-sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
-pytest==7.4.3
-pytest-cov==4.1.0
-PyMySQL==1.1.1
 streamlit>=1.0
 ploty>=5.0.0
+factory-boy
+pandas
+sqlalchemy
+psycopg2-binary
+pytest
+pytest-cov
+PyMySQL
+dotenv
