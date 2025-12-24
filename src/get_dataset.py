@@ -11,9 +11,7 @@ class SalesRecordFactory(factory.Factory):
     
     # Аномалия: даты могут быть None или неправильный формат
     sale_date = factory.LazyFunction(
-        lambda: None if random.random() < 0.1 else 
-        (datetime.now() - timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d') if random.random() < 0.8 
-        else 'invalid_date'
+        lambda:(datetime.now() - timedelta(days=random.randint(0, 365))).strftime('%Y-%m-%d')
     )
     
     # Аномалия: пробелы, None, пустые строки

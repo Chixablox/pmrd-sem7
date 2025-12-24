@@ -32,4 +32,10 @@ def fill_dm_table():
             text("select s_psql_dds.fn_dm_data_load(:start_date, :end_date)"),
             {"start_date": start_date, "end_date": end_date},
         )
+        run_sql_file(conn, "sql/dds/table/t_dq_check_results.sql")
+        run_sql_file(conn, "sql/dds/function/fn_dq_checks_load.sql")
+        conn.execute(
+            text("select s_psql_dds.fn_dq_checks_load(:start_date, :end_date)"),
+            {"start_date": start_date, "end_date": end_date},
+        )
         conn.commit()
