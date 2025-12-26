@@ -1,4 +1,5 @@
-create or replace view s_psql_dds.v_dm_task as
+drop view if exists s_psql_dds.v_dm_task;
+create view s_psql_dds.v_dm_task as
 select
     id,
     sale_date,

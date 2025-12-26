@@ -9,8 +9,7 @@ from config import DATABASE_URL
 
 
 @st.cache_data(ttl=300)
-def load_data(limit: int = 1000):
-    """Загрузка данных из таблицы результатов проверок качества"""
+def load_data(limit):
     engine = create_engine(DATABASE_URL)
     q = text(
         "select check_id, check_type, table_name, execution_date, status, error_message "
@@ -24,7 +23,6 @@ def load_data(limit: int = 1000):
 
 
 def create_status_pie_chart(df):
-    """Круговая диаграмма распределения статусов"""
     status_counts = df['status'].value_counts().reset_index()
     status_counts.columns = ['status', 'count']
     
@@ -50,7 +48,6 @@ def create_status_pie_chart(df):
 
 
 def create_check_type_bar_chart(df):
-    """Столбчатая диаграмма по типам проверок"""
     check_status = df.groupby(['check_type', 'status']).size().reset_index(name='count')
     
     fig = px.bar(
@@ -73,9 +70,8 @@ def create_check_type_bar_chart(df):
 
 
 def create_timeline_chart(df):
-    """График изменения статусов во времени"""
     df_sorted = df.sort_values('execution_date')
-    timeline = df_sorted.groupby([pd.Grouper(key='execution_date', freq='H'), 'status']).size().reset_index(name='count')
+    timeline = df_sorted.groupby([pd.Grouper(key='execution_date', freq='1min'), 'status']).size().reset_index(name='count')
     
     fig = px.line(
         timeline,
@@ -95,7 +91,6 @@ def create_timeline_chart(df):
 
 
 def create_success_rate_gauge(df):
-    """Индикатор общего процента успешных проверок"""
     total = len(df)
     passed = len(df[df['status'] == 'passed'])
     success_rate = (passed / total * 100) if total > 0 else 0
@@ -126,13 +121,12 @@ def create_success_rate_gauge(df):
 
 
 def main():
-    st.set_page_config(page_title="Data Quality Dashboard", layout="wide", page_icon="📊")
+    st.set_page_config(page_title="Data Quality Dashboard", layout="wide", page_icon="")
     
-    st.title("📊 Data Quality Dashboard")
+    st.title("Data Quality Dashboard")
     st.markdown("Дашборд для мониторинга качества данных в `s_psql_dds.t_dq_check_results`")
     
-    # Боковая панель с настройками
-    st.sidebar.header("⚙️ Настройки")
+    st.sidebar.header("Настройки")
     limit = st.sidebar.number_input(
         "Количество записей", 
         min_value=50, 
@@ -141,34 +135,28 @@ def main():
         step=50
     )
     
-    # Загрузка данных
     with st.spinner('Загрузка данных...'):
         df = load_data(limit)
     
     if df.empty:
-        st.warning("⚠️ Нет данных о проверках качества")
+        st.warning("Нет данных о проверках качества")
         st.info("Убедитесь, что функция `fn_dq_checks_load()` была запущена и результаты записаны в таблицу.")
         return
     
-    # Фильтры в боковой панели
-    st.sidebar.header("🔍 Фильтры")
+    st.sidebar.header("Фильтры")
     
-    # Фильтр по статусу
     all_statuses = ['Все'] + list(df['status'].unique())
     selected_status = st.sidebar.selectbox("Статус", all_statuses)
     
-    # Фильтр по типу проверки
     all_check_types = ['Все'] + list(df['check_type'].unique())
     selected_check_type = st.sidebar.selectbox("Тип проверки", all_check_types)
     
-    # Применение фильтров
     filtered_df = df.copy()
     if selected_status != 'Все':
         filtered_df = filtered_df[filtered_df['status'] == selected_status]
     if selected_check_type != 'Все':
         filtered_df = filtered_df[filtered_df['check_type'] == selected_check_type]
     
-    # Метрики в верхней части
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -188,8 +176,7 @@ def main():
     
     st.divider()
     
-    # Визуализации
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 Обзор", "📊 По типам проверок", "⏱️ Временная динамика", "📋 Данные"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Обзор", "По типам проверок", "Временная динамика", "Данные"])
     
     with tab1:
         col1, col2 = st.columns(2)
@@ -200,15 +187,13 @@ def main():
         with col2:
             st.plotly_chart(create_success_rate_gauge(filtered_df), use_container_width=True)
         
-        # Последние проверки
-        st.subheader("🕐 Последние проверки")
+        st.subheader("Последние проверки")
         latest_checks = filtered_df.head(10)[['execution_date', 'check_type', 'table_name', 'status', 'error_message']]
         st.dataframe(latest_checks, use_container_width=True, hide_index=True)
     
     with tab2:
         st.plotly_chart(create_check_type_bar_chart(filtered_df), use_container_width=True)
         
-        # Детализация по типам проверок
         st.subheader("Статистика по типам проверок")
         check_stats = filtered_df.groupby(['check_type', 'status']).size().reset_index(name='count')
         check_pivot = check_stats.pivot(index='check_type', columns='status', values='count').fillna(0)
@@ -217,7 +202,6 @@ def main():
     with tab3:
         st.plotly_chart(create_timeline_chart(filtered_df), use_container_width=True)
         
-        # Группировка по датам
         st.subheader("Проверки по датам")
         filtered_df['date'] = filtered_df['execution_date'].dt.date
         date_stats = filtered_df.groupby(['date', 'status']).size().reset_index(name='count')
@@ -225,7 +209,7 @@ def main():
         st.dataframe(date_pivot, use_container_width=True)
     
     with tab4:
-        st.subheader("🔴 Проваленные проверки")
+        st.subheader("Проваленные проверки")
         failed_checks = filtered_df[filtered_df['status'] == 'failed']
         if not failed_checks.empty:
             st.dataframe(
@@ -234,17 +218,16 @@ def main():
                 hide_index=True
             )
         else:
-            st.success("✅ Нет проваленных проверок!")
+            st.success("Нет проваленных проверок!")
         
         st.divider()
         
-        st.subheader("📄 Все проверки (полная таблица)")
+        st.subheader("Все проверки")
         st.dataframe(filtered_df, use_container_width=True, hide_index=True)
         
-        # Экспорт данных
         csv = filtered_df.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="📥 Скачать данные (CSV)",
+            label="Скачать данные (CSV)",
             data=csv,
             file_name=f"dq_checks_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
             mime="text/csv"

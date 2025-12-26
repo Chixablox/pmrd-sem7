@@ -93,19 +93,19 @@ begin
                'Found ' || neg_count || ' records with negative quantity or price');
     end if;
 
-    -- 4) Уникальность: отсутствие дубликатов по ключевому полю source_id
-    select count(*) - count(distinct source_id) into dup_count 
+    -- 4) Уникальность: отсутствие дубликатов по ключевому полю id
+    select count(*) - count(distinct id) into dup_count 
     from s_psql_dds.v_dm_task v
     where v.sale_date between start_dt and end_dt;
 
     if dup_count = 0 then
         insert into s_psql_dds.t_dq_check_results(check_type, table_name, status, error_message)
         values('uniqueness', 'v_dm_task', 'passed', 
-               'No duplicate source_id values');
+               'No duplicate id values');
     else
         insert into s_psql_dds.t_dq_check_results(check_type, table_name, status, error_message)
         values('uniqueness', 'v_dm_task', 'failed', 
-               'Found ' || dup_count || ' duplicate source_id values');
+               'Found ' || dup_count || ' duplicate id values');
     end if;
 
     -- 5) Валидность: статусы соответствуют допустимым значениям
